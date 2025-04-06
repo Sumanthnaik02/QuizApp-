@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Quiz</title>
+    <style>
+        body { font-family: Arial; margin: 20px; }
+        .question { margin-bottom: 20px; }
+        .option { margin: 5px 0; }
+        button { margin-top: 20px; padding: 10px 15px; font-size: 16px; }
+    </style>
+</head>
+<body>
+<h1>Quiz</h1>
+<div id="quiz-container"></div>
+<button onclick="submitAnswers()">Submit</button>
+<div id="result" style="margin-top: 30px;"></div>
+
+<script>
+    let quizData = [];
+
+    // Fetch questions from backend
+    fetch('/quiz/questions')
+        .then(res => res.json())
+        .then(data => {
+            quizData = data;
+            const container = document.getElementById('quiz-container');
+            quizData.forEach((q, index) => {
+                const div = document.createElement('div');
+                div.className = 'question';
+                div.innerHTML = `
+                    <p><strong>Q${index + 1}:</strong> ${q.question}</p>
+                    <label class="option"><input type="radio" name="q${q.id}" value="${q.option1}"> ${q.option1}</label><br>
+                    <label class="option"><input type="radio" name="q${q.id}" value="${q.option2}"> ${q.option2}</label><br>
+                    <label class="option"><input type="radio" name="q${q.id}" value="${q.option3}"> ${q.option3}</label><br>
+                    <label class="option"><input type="radio" name="q${q.id}" value="${q.option4}"> ${q.option4}</label>
+                `;
+                container.appendChild(div);
+            });
+        });
+
+    function submitAnswers() {
+        const userAnswers = [];
+
+        quizData.forEach(q => {
+            const selected = document.querySelector(`input[name="q${q.id}"]:checked`);
+            userAnswers.push({
+                questionId: q.id,
+                answer: selected ? selected.value : ""
+            });
+        });
+
+        fetch('/quiz/submit', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(userAnswers)
+        })
+        .then(res => {
+            if (!res.ok) throw new Error("Submission failed");
+            return res.json();
+        })
+        .then(data => {
+            const score = data.Score;
+            const review = data.review;
+
+            let resultHTML = `<h2>Your Score: ${score}</h2><h3>Review:</h3><ul>`;
+            review.forEach(r => {
+                resultHTML += `
+                    <li>
+                        <strong>${r.question}</strong><br>
+                        Your answer: ${r.answer}<br>
+                        Correct answer: ${r.correctAnswer}
+                    </li>
+                `;
+            });
+            resultHTML += `</ul>`;
+
+            document.getElementById('result').innerHTML = resultHTML;
+        })
+        .catch(err => {
+            document.getElementById('result').innerHTML = `<h2 style="color: red;">Error: ${err.message}</h2>`;
+        });
+    }
+</script>
+</body>
+</html>
