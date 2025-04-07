@@ -7,6 +7,6 @@ RUN ./mvnw clean package -DskipTests
 # Use a JDK image to run the app
 FROM eclipse-temurin:17
 WORKDIR /app
-COPY --from=build /app/target/*.jar app.jar
+COPY --from=build /app/target/QuizApp-0.0.1-SNAPSHOT.jar QuizApp.jar
 EXPOSE 8080
-ENTRYPOINT ["java", "-jar", "app.jar"]
+ENTRYPOINT ["java", "-jar", "QuizApp.jar"]

@@ -5,7 +5,8 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class UserAnswer {
+public class
+UserAnswer {
     private Long questionId;
     private String answer;
 }
