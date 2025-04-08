@@ -12,7 +12,6 @@ import java.util.List;
 
 @Service
 public class QuizService {
-    @Autowired
     private final QuizRepository questionRepository;
 
     QuizService(QuizRepository questionRepository){

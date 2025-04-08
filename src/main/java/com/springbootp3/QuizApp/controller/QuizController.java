@@ -14,7 +14,6 @@ import java.util.Map;
 @RestController
 @RequestMapping("/quiz")
 public class QuizController {
-    @Autowired
     private final QuizService quizService;
 
     public QuizController(QuizService quizService) {
